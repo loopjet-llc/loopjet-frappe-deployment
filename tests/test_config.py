@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -35,6 +36,18 @@ class ConfigurationTest(unittest.TestCase):
 		module = load_script("check-upstream-updates.py")
 		versions = ["v16.9.2", "v16.10.0", "v16.9.12"]
 		self.assertEqual(max(versions, key=module.version_key), "v16.10.0")
+
+	def test_build_overlay_is_idempotent(self):
+		module = load_script("apply-frappe-docker-overlay.py")
+		with tempfile.TemporaryDirectory() as temporary:
+			root = Path(temporary)
+			containerfile = root / "images" / "custom" / "Containerfile"
+			containerfile.parent.mkdir(parents=True)
+			containerfile.write_text(module.NEEDLE)
+			module.apply_overlay(root)
+			module.apply_overlay(root)
+			content = containerfile.read_text()
+			self.assertEqual(content.count("ARG NODE_OPTIONS"), 1)
 
 
 if __name__ == "__main__":

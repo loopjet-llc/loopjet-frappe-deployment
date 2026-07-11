@@ -15,5 +15,5 @@ fi
 
 git -C "$RUNTIME" checkout --detach "$REF" >&2
 git -C "$RUNTIME" reset --hard "$REF" >&2
-git -C "$RUNTIME" apply "$ROOT/config/frappe-docker.patch"
+python3 "$ROOT/scripts/apply-frappe-docker-overlay.py" "$RUNTIME"
 printf '%s\n' "$RUNTIME"

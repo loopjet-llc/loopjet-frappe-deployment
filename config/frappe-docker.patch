@@ -1,8 +1,0 @@
-diff --git a/images/custom/Containerfile b/images/custom/Containerfile
---- a/images/custom/Containerfile
-+++ b/images/custom/Containerfile
-@@ -86,1 +86,4 @@ RUN useradd -ms /bin/bash frappe \
-     && chmod 644 /templates/nginx/frappe.conf.template
-+ARG NODE_OPTIONS=--max-old-space-size=4096
-+ENV NODE_OPTIONS=${NODE_OPTIONS}
-+
