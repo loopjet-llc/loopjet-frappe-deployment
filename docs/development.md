@@ -15,9 +15,9 @@ Apple Silicon developers can set `BUILD_PLATFORM=linux/arm64` in `.env` for a
 native local build. Production remains `linux/amd64` unless the VPS architecture
 is explicitly ARM64.
 
-`SOURCE_MODE=upstream ./scripts/build-image.sh` is an emergency continuity path
-that builds the same pinned tags directly from official Frappe repositories.
-Normal builds use the Loopjet mirrors.
+Normal builds use exact official Frappe release tags. Running
+`SOURCE_MODE=mirror ./scripts/build-image.sh` is the continuity path for building
+the same reviewed tags from Loopjet mirrors.
 
 Source development for `loopjet_frappe_custom` should use a Frappe Bench
 development container. Production images are immutable and should not be edited

@@ -4,7 +4,7 @@
 
 The five public `loopjet-*` product repositories mirror the corresponding
 Frappe upstream projects. They exist for continuity, auditability, and isolated
-emergency patches. Daily workflows merge upstream changes and mirror tags, but
+emergency patches. Daily workflows fast-forward their product branches, but
 production does not automatically adopt those changes.
 
 `loopjet-frappe-custom` owns Loopjet behavior. `loopjet-frappe-deployment` owns
@@ -15,7 +15,7 @@ the version lock, image build, environment composition, and operating scripts.
 One immutable image contains Frappe Framework, ERPNext, HRMS, CRM, Helpdesk,
 and Loopjet Custom. Site installation determines which apps are active:
 
-The image uses Frappe Docker's source-building `custom` Containerfile. This is
+The image uses exact official release tags and Frappe Docker's source-building `custom` Containerfile. This is
 intentional: exact Frappe release tags do not always have matching prebuilt
 `frappe/base` and `frappe/build` images required by the layered build.
 

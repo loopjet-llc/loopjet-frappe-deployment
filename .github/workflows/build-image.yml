@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Generate application manifest
-        run: ./scripts/generate-apps.py
+        run: ./scripts/generate-apps.py --upstream
       - name: Read version lock
         id: versions
         run: |
@@ -46,7 +46,7 @@ jobs:
           push: true
           platforms: linux/amd64
           build-args: |
-            FRAPPE_PATH=https://github.com/loopjet-llc/loopjet-frappe.git
+            FRAPPE_PATH=https://github.com/frappe/frappe.git
             FRAPPE_BRANCH=${{ steps.versions.outputs.frappe_ref }}
           secret-files: |
             apps_json=${{ github.workspace }}/config/apps.generated.json

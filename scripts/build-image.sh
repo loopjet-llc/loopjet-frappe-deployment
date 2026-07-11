@@ -9,7 +9,7 @@ cd "$ROOT"
 CUSTOM_IMAGE=${CUSTOM_IMAGE:-ghcr.io/loopjet-llc/loopjet-frappe-suite}
 CUSTOM_TAG=${CUSTOM_TAG:-local}
 BUILD_PLATFORM=${BUILD_PLATFORM:-linux/amd64}
-SOURCE_MODE=${SOURCE_MODE:-mirror}
+SOURCE_MODE=${SOURCE_MODE:-upstream}
 
 RUNTIME=$(./scripts/bootstrap-frappe-docker.sh)
 generate_args=()
