@@ -20,7 +20,7 @@ docker build \
   --build-arg "FRAPPE_BRANCH=$FRAPPE_REF" \
   --secret "id=apps_json,src=$ROOT/config/apps.generated.json" \
   --tag "$CUSTOM_IMAGE:$CUSTOM_TAG" \
-  --file "$RUNTIME/images/layered/Containerfile" \
+  --file "$RUNTIME/images/custom/Containerfile" \
   "$RUNTIME"
 
 printf 'Built %s:%s\n' "$CUSTOM_IMAGE" "$CUSTOM_TAG"

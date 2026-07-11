@@ -15,6 +15,10 @@ the version lock, image build, environment composition, and operating scripts.
 One immutable image contains Frappe Framework, ERPNext, HRMS, CRM, Helpdesk,
 and Loopjet Custom. Site installation determines which apps are active:
 
+The image uses Frappe Docker's source-building `custom` Containerfile. This is
+intentional: exact Frappe release tags do not always have matching prebuilt
+`frappe/base` and `frappe/build` images required by the layered build.
+
 ```mermaid
 flowchart TD
   I["Pinned immutable application image"] --> E["ERP site: ERPNext + HRMS + Loopjet Custom"]
