@@ -2,10 +2,14 @@
 
 ## Repository boundaries
 
-The five public `loopjet-*` product repositories mirror the corresponding
+The five public product repositories mirror the corresponding
 Frappe upstream projects. They exist for continuity, auditability, and isolated
 emergency patches. Daily workflows fast-forward their product branches, but
 production does not automatically adopt those changes.
+
+An additional `loopjet-telephony` mirror pins Helpdesk's required Telephony app.
+Upstream Telephony currently has only a floating `develop` branch, so Loopjet
+creates reviewed dated tags rather than allowing non-reproducible builds.
 
 `loopjet-frappe-custom` owns Loopjet behavior. `loopjet-frappe-deployment` owns
 the version lock, image build, environment composition, and operating scripts.

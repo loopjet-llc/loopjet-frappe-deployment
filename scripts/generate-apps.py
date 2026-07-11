@@ -15,13 +15,12 @@ DEFAULT_OUTPUT = ROOT / "config" / "apps.generated.json"
 
 def generate(version_file: Path = VERSIONS, upstream: bool = False) -> list[dict[str, str]]:
 	data = json.loads(version_file.read_text())
-	return [
-		{
-			"url": f"https://github.com/{app.get('upstream', app['repository']) if upstream else app['repository']}.git",
-			"branch": app["ref"],
-		}
-		for app in data["apps"]
-	]
+	manifest = []
+	for app in data["apps"]:
+		use_upstream = upstream and not app.get("use_mirror", False)
+		repository = app.get("upstream", app["repository"]) if use_upstream else app["repository"]
+		manifest.append({"url": f"https://github.com/{repository}.git", "branch": app["ref"]})
+	return manifest
 
 
 def main() -> None:
