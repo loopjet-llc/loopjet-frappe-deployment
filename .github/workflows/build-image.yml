@@ -13,7 +13,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Generate application manifest
         run: ./scripts/generate-apps.py --upstream
       - name: Read version lock
@@ -21,7 +21,7 @@ jobs:
         run: |
           echo "frappe_ref=$(python -c 'import json; print(json.load(open("config/versions.json"))["frappe"]["ref"])')" >> "$GITHUB_OUTPUT"
           echo "docker_ref=$(python -c 'import json; print(json.load(open("config/versions.json"))["frappe_docker"]["ref"])')" >> "$GITHUB_OUTPUT"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           repository: frappe/frappe_docker
           ref: ${{ steps.versions.outputs.docker_ref }}
@@ -29,7 +29,7 @@ jobs:
       - name: Apply reviewed build overlay
         run: python scripts/apply-frappe-docker-overlay.py .frappe-docker
       - uses: docker/setup-buildx-action@v4
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
