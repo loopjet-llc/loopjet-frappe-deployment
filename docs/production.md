@@ -19,6 +19,12 @@ storage. Sixteen GB RAM is preferred when staging and production share a host.
 The production composition adds Traefik with automatic Let's Encrypt certificates.
 Do not expose MariaDB or Redis ports publicly.
 
+Loopjet uses one connected Frappe site. `ERP_SITE` is the canonical site and
+installs ERPNext, HRMS, Frappe CRM, Frappe Helpdesk, Telephony, and the Loopjet
+custom app into one database. `CRM_SITE` and `HELPDESK_SITE` are domain aliases
+for that same site, which keeps leads, deals, quotations, invoices, customers,
+contacts, and tickets connected.
+
 ## Existing Hostinger Docker and Traefik VPS
 
 When Hostinger's Traefik project already owns ports 80 and 443, keep it in place
@@ -27,8 +33,9 @@ Frappe frontend but does not start another proxy or publish MariaDB, Redis, or
 Frappe ports on the host.
 
 Set the production hostnames in `ERP_SITE`, `CRM_SITE`, and `HELPDESK_SITE`, add
-all three hosts to `SITES_RULE`, and set `HEALTHCHECK_SCHEME=https` and
-`HEALTHCHECK_PORT=443`. Start and initialize the stack with:
+all three hosts to `SITES_RULE`, set `ERP_COMPANY` to the ERPNext company name,
+and set `HEALTHCHECK_SCHEME=https` and `HEALTHCHECK_PORT=443`. Start and
+initialize the stack with:
 
 ```sh
 ./scripts/stack.sh hostinger up -d

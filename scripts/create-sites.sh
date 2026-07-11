@@ -10,9 +10,11 @@ source .env
 set +a
 
 MODE=${STACK_MODE:-local}
+ERP_COMPANY=${ERP_COMPANY:-Loopjet LLC}
+CRM_CREATE_CUSTOMER_DEAL_STATUS=${CRM_CREATE_CUSTOMER_DEAL_STATUS:-Won}
 
 site_exists() {
-  ./scripts/stack.sh "$MODE" exec -T backend test -d "sites/$1"
+  ./scripts/stack.sh "$MODE" exec -T backend test -e "sites/$1"
 }
 
 create_site() {
@@ -40,19 +42,33 @@ install_app() {
 create_site "$ERP_SITE"
 install_app "$ERP_SITE" erpnext
 install_app "$ERP_SITE" hrms
+install_app "$ERP_SITE" crm
+install_app "$ERP_SITE" helpdesk
 install_app "$ERP_SITE" loopjet_frappe_custom
 
-create_site "$CRM_SITE"
-install_app "$CRM_SITE" crm
-install_app "$CRM_SITE" loopjet_frappe_custom
+ensure_alias() {
+  local alias=$1
+  [[ "$alias" == "$ERP_SITE" ]] && return
 
-create_site "$HELPDESK_SITE"
-install_app "$HELPDESK_SITE" helpdesk
-install_app "$HELPDESK_SITE" loopjet_frappe_custom
+  if ./scripts/stack.sh "$MODE" exec -T backend test -d "sites/$alias" && \
+     ! ./scripts/stack.sh "$MODE" exec -T backend test -L "sites/$alias"; then
+    echo "Refusing to replace existing standalone site $alias. Back it up and move it aside first." >&2
+    exit 2
+  fi
 
-for site in "$ERP_SITE" "$CRM_SITE" "$HELPDESK_SITE"; do
-  ./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" migrate
-  ./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" enable-scheduler
-done
+  ./scripts/stack.sh "$MODE" exec -T backend bench setup add-domain "$alias" --site "$ERP_SITE"
+  ./scripts/stack.sh "$MODE" exec -T backend ln -sfn "$ERP_SITE" "sites/$alias"
+}
 
-echo "All Loopjet sites are ready."
+ensure_alias "$CRM_SITE"
+ensure_alias "$HELPDESK_SITE"
+
+./scripts/stack.sh "$MODE" exec -T backend bench --site "$ERP_SITE" migrate
+./scripts/stack.sh "$MODE" exec -T backend bench --site "$ERP_SITE" enable-scheduler
+./scripts/stack.sh "$MODE" exec -T backend bench --site "$ERP_SITE" execute \
+  "frappe.get_doc(\"ERPNext CRM Settings\").update({\"enabled\": 1, \"erpnext_company\": \"$ERP_COMPANY\", \"is_erpnext_in_different_site\": 0, \"create_customer_on_status_change\": 1, \"deal_status\": \"$CRM_CREATE_CUSTOMER_DEAL_STATUS\"}).save"
+./scripts/stack.sh "$MODE" exec -T backend bench --site "$ERP_SITE" execute \
+  "frappe.get_doc(\"ERPNext HD Settings\").update({\"enabled\": 1}).save"
+./scripts/stack.sh "$MODE" exec -T backend bench --site "$ERP_SITE" clear-cache
+
+echo "Loopjet connected Frappe site is ready. $CRM_SITE and $HELPDESK_SITE are aliases of $ERP_SITE."
