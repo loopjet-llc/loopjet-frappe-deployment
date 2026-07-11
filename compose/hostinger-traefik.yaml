@@ -1,0 +1,8 @@
+services:
+  frontend:
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.loopjet-frappe.loadbalancer.server.port=8080
+      - traefik.http.routers.loopjet-frappe.entrypoints=websecure
+      - traefik.http.routers.loopjet-frappe.tls.certresolver=${TRAEFIK_CERTRESOLVER:-letsencrypt}
+      - traefik.http.routers.loopjet-frappe.rule=${SITES_RULE:?SITES_RULE not set}

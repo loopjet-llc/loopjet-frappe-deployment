@@ -18,7 +18,8 @@ files=(
 case "$MODE" in
   local) files+=(-f "$RUNTIME/overrides/compose.noproxy.yaml") ;;
   production) files+=(-f "$RUNTIME/overrides/compose.https.yaml") ;;
-  *) echo "Usage: $0 {local|production} [docker compose arguments...]" >&2; exit 2 ;;
+  hostinger) files+=(-f "$ROOT/compose/hostinger-traefik.yaml") ;;
+  *) echo "Usage: $0 {local|production|hostinger} [docker compose arguments...]" >&2; exit 2 ;;
 esac
 
 exec docker compose --project-name loopjet-frappe --env-file "${ENV_FILE:-$ROOT/.env}" "${files[@]}" "$@"

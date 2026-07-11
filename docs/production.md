@@ -19,6 +19,23 @@ storage. Sixteen GB RAM is preferred when staging and production share a host.
 The production composition adds Traefik with automatic Let's Encrypt certificates.
 Do not expose MariaDB or Redis ports publicly.
 
+## Existing Hostinger Docker and Traefik VPS
+
+When Hostinger's Traefik project already owns ports 80 and 443, keep it in place
+and set `STACK_MODE=hostinger`. The Hostinger mode adds routing labels to the
+Frappe frontend but does not start another proxy or publish MariaDB, Redis, or
+Frappe ports on the host.
+
+Set the production hostnames in `ERP_SITE`, `CRM_SITE`, and `HELPDESK_SITE`, add
+all three hosts to `SITES_RULE`, and set `HEALTHCHECK_SCHEME=https` and
+`HEALTHCHECK_PORT=443`. Start and initialize the stack with:
+
+```sh
+./scripts/stack.sh hostinger up -d
+STACK_MODE=hostinger ./scripts/create-sites.sh
+./scripts/healthcheck.sh
+```
+
 ## Required external inputs
 
 Final deployment requires the VPS address and SSH access, production hostnames,
