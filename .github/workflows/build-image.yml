@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Generate application manifest
-        run: ./scripts/generate-apps.py
+        run: ./scripts/generate-apps.py --upstream
       - name: Read version lock
         id: versions
         run: |
@@ -26,28 +26,31 @@ jobs:
           repository: frappe/frappe_docker
           ref: ${{ steps.versions.outputs.docker_ref }}
           path: .frappe-docker
-      - uses: docker/setup-buildx-action@v3
+      - name: Apply reviewed build overlay
+        run: python scripts/apply-frappe-docker-overlay.py .frappe-docker
+      - uses: docker/setup-buildx-action@v4
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/metadata-action@v5
+      - uses: docker/metadata-action@v6
         id: meta
         with:
           images: ghcr.io/loopjet-llc/loopjet-frappe-suite
           tags: |
             type=ref,event=tag
             type=sha
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         with:
           context: .frappe-docker
-          file: .frappe-docker/images/layered/Containerfile
+          file: .frappe-docker/images/custom/Containerfile
           push: true
           platforms: linux/amd64
           build-args: |
-            FRAPPE_PATH=https://github.com/loopjet-llc/loopjet-frappe.git
+            FRAPPE_PATH=https://github.com/frappe/frappe.git
             FRAPPE_BRANCH=${{ steps.versions.outputs.frappe_ref }}
+            NODE_OPTIONS=--max-old-space-size=4096
           secret-files: |
             apps_json=${{ github.workspace }}/config/apps.generated.json
           tags: ${{ steps.meta.outputs.tags }}

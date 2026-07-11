@@ -9,18 +9,28 @@ cd "$ROOT"
 CUSTOM_IMAGE=${CUSTOM_IMAGE:-ghcr.io/loopjet-llc/loopjet-frappe-suite}
 CUSTOM_TAG=${CUSTOM_TAG:-local}
 BUILD_PLATFORM=${BUILD_PLATFORM:-linux/amd64}
+SOURCE_MODE=${SOURCE_MODE:-upstream}
 
 RUNTIME=$(./scripts/bootstrap-frappe-docker.sh)
-./scripts/generate-apps.py
+generate_args=()
+FRAPPE_PATH=https://github.com/loopjet-llc/loopjet-frappe.git
+if [[ "$SOURCE_MODE" == upstream ]]; then
+  generate_args+=(--upstream)
+  FRAPPE_PATH=https://github.com/frappe/frappe.git
+elif [[ "$SOURCE_MODE" != mirror ]]; then
+  echo "SOURCE_MODE must be 'mirror' or 'upstream'." >&2
+  exit 2
+fi
+./scripts/generate-apps.py "${generate_args[@]}"
 FRAPPE_REF=$(python3 -c 'import json; print(json.load(open("config/versions.json"))["frappe"]["ref"])')
 
 docker build \
   --platform "$BUILD_PLATFORM" \
-  --build-arg "FRAPPE_PATH=https://github.com/loopjet-llc/loopjet-frappe.git" \
+  --build-arg "FRAPPE_PATH=$FRAPPE_PATH" \
   --build-arg "FRAPPE_BRANCH=$FRAPPE_REF" \
   --secret "id=apps_json,src=$ROOT/config/apps.generated.json" \
   --tag "$CUSTOM_IMAGE:$CUSTOM_TAG" \
-  --file "$RUNTIME/images/layered/Containerfile" \
+  --file "$RUNTIME/images/custom/Containerfile" \
   "$RUNTIME"
 
 printf 'Built %s:%s\n' "$CUSTOM_IMAGE" "$CUSTOM_TAG"

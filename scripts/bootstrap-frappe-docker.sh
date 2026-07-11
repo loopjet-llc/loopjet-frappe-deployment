@@ -13,5 +13,7 @@ else
   git clone https://github.com/frappe/frappe_docker.git "$RUNTIME"
 fi
 
-git -C "$RUNTIME" checkout --detach "$REF"
+git -C "$RUNTIME" checkout --detach "$REF" >&2
+git -C "$RUNTIME" reset --hard "$REF" >&2
+python3 "$ROOT/scripts/apply-frappe-docker-overlay.py" "$RUNTIME"
 printf '%s\n' "$RUNTIME"

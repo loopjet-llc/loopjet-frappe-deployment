@@ -11,6 +11,14 @@ Copy `.env.example` to `.env`, replace local passwords, then run the commands in
 the main README. `.localhost` hostnames resolve to the local machine without a
 hosts-file change in modern browsers.
 
+Apple Silicon developers can set `BUILD_PLATFORM=linux/arm64` in `.env` for a
+native local build. Production remains `linux/amd64` unless the VPS architecture
+is explicitly ARM64.
+
+Normal builds use exact official Frappe release tags. Running
+`SOURCE_MODE=mirror ./scripts/build-image.sh` is the continuity path for building
+the same reviewed tags from Loopjet mirrors.
+
 Source development for `loopjet_frappe_custom` should use a Frappe Bench
 development container. Production images are immutable and should not be edited
 inside running containers.
