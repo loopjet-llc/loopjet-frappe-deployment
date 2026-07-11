@@ -26,6 +26,8 @@ jobs:
           repository: frappe/frappe_docker
           ref: ${{ steps.versions.outputs.docker_ref }}
           path: .frappe-docker
+      - name: Apply reviewed build overlay
+        run: git -C .frappe-docker apply "$GITHUB_WORKSPACE/config/frappe-docker.patch"
       - uses: docker/setup-buildx-action@v4
       - uses: docker/login-action@v3
         with:
@@ -48,6 +50,7 @@ jobs:
           build-args: |
             FRAPPE_PATH=https://github.com/frappe/frappe.git
             FRAPPE_BRANCH=${{ steps.versions.outputs.frappe_ref }}
+            NODE_OPTIONS=--max-old-space-size=4096
           secret-files: |
             apps_json=${{ github.workspace }}/config/apps.generated.json
           tags: ${{ steps.meta.outputs.tags }}

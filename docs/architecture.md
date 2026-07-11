@@ -18,6 +18,8 @@ and Loopjet Custom. Site installation determines which apps are active:
 The image uses exact official release tags and Frappe Docker's source-building `custom` Containerfile. This is
 intentional: exact Frappe release tags do not always have matching prebuilt
 `frappe/base` and `frappe/build` images required by the layered build.
+The small reviewed build overlay caps Node's heap at 4 GB so the combined CRM
+and Helpdesk frontend build remains stable on standard CI and VPS builders.
 
 ```mermaid
 flowchart TD
