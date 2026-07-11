@@ -52,6 +52,7 @@ install_app "$HELPDESK_SITE" loopjet_frappe_custom
 
 for site in "$ERP_SITE" "$CRM_SITE" "$HELPDESK_SITE"; do
   ./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" migrate
+  ./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" enable-scheduler
 done
 
 echo "All Loopjet sites are ready."
