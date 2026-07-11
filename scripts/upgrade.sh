@@ -18,12 +18,11 @@ MODE=${STACK_MODE:-production}
 ./scripts/stack.sh "$MODE" pull
 ./scripts/stack.sh "$MODE" up -d --remove-orphans
 
-for site in "$ERP_SITE" "$CRM_SITE" "$HELPDESK_SITE"; do
-  ./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" set-maintenance-mode on
-  ./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" migrate
-  ./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" clear-cache
-  ./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" set-maintenance-mode off
-done
+site=$ERP_SITE
+./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" set-maintenance-mode on
+./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" migrate
+./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" clear-cache
+./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" set-maintenance-mode off
 
 ./scripts/healthcheck.sh
 echo "Upgrade completed. Retain the pre-upgrade backup until business validation is complete."

@@ -20,7 +20,8 @@ private_files=${4:-}
 MODE=${STACK_MODE:-production}
 
 case "$site" in
-  "$ERP_SITE"|"$CRM_SITE"|"$HELPDESK_SITE") ;;
+  "$ERP_SITE") ;;
+  "$CRM_SITE"|"$HELPDESK_SITE") echo "$site is an alias of $ERP_SITE. Restore $ERP_SITE instead." >&2; exit 2 ;;
   *) echo "Refusing to restore unknown site: $site" >&2; exit 2 ;;
 esac
 
