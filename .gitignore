@@ -1,0 +1,8 @@
+.DS_Store
+.cache/
+.env
+.runtime/
+backups/
+config/apps.generated.json
+loopjet-frappe-custom/
+upstream-mirrors/

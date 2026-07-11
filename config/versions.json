@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "generated_at": "2026-07-11",
+  "frappe_docker": {
+    "repository": "frappe/frappe_docker",
+    "ref": "v3.2.1"
+  },
+  "frappe": {
+    "repository": "loopjet-llc/loopjet-frappe",
+    "upstream": "frappe/frappe",
+    "ref": "v16.26.3"
+  },
+  "apps": [
+    {
+      "name": "erpnext",
+      "repository": "loopjet-llc/loopjet-erpnext",
+      "upstream": "frappe/erpnext",
+      "ref": "v16.26.2"
+    },
+    {
+      "name": "hrms",
+      "repository": "loopjet-llc/loopjet-hrms",
+      "upstream": "frappe/hrms",
+      "ref": "v16.12.1"
+    },
+    {
+      "name": "crm",
+      "repository": "loopjet-llc/loopjet-crm",
+      "upstream": "frappe/crm",
+      "ref": "v1.77.3"
+    },
+    {
+      "name": "helpdesk",
+      "repository": "loopjet-llc/loopjet-helpdesk",
+      "upstream": "frappe/helpdesk",
+      "ref": "v1.27.0"
+    },
+    {
+      "name": "loopjet_frappe_custom",
+      "repository": "loopjet-llc/loopjet-frappe-custom",
+      "ref": "v0.1.0",
+      "track": false
+    }
+  ]
+}

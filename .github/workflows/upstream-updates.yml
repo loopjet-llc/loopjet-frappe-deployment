@@ -1,0 +1,34 @@
+name: Propose upstream updates
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 4 * * 1"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Update compatible release lock
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/check-upstream-updates.py --update
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          branch: automation/upstream-releases
+          delete-branch: true
+          title: "chore: update pinned Frappe releases"
+          commit-message: "chore: update pinned Frappe releases"
+          body: |
+            Automated compatible release update.
+
+            The full image build, fresh installation, and migration smoke test must pass before merge.
+          labels: dependencies

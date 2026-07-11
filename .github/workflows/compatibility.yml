@@ -1,0 +1,41 @@
+name: Full compatibility
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - config/versions.json
+      - compose/**
+      - scripts/**
+  schedule:
+    - cron: "41 2 * * 0"
+
+permissions:
+  contents: read
+
+jobs:
+  install-and-smoke-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure test environment
+        run: |
+          cp .env.example .env
+          sed -i 's/CUSTOM_TAG=.*/CUSTOM_TAG=compatibility/' .env
+          sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=compatibility-db/' .env
+          sed -i 's/ADMIN_PASSWORD=.*/ADMIN_PASSWORD=compatibility-admin/' .env
+      - name: Build pinned image
+        run: ./scripts/build-image.sh
+      - name: Start services
+        run: ./scripts/stack.sh local up -d
+      - name: Create and migrate sites
+        run: ./scripts/create-sites.sh
+      - name: Smoke test
+        run: ./scripts/healthcheck.sh
+      - name: Show failure logs
+        if: failure()
+        run: ./scripts/stack.sh local logs --no-color --tail=500
+      - name: Remove test environment
+        if: always()
+        run: ./scripts/stack.sh local down -v --remove-orphans

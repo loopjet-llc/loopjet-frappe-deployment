@@ -1,0 +1,27 @@
+services:
+  configurator:
+    image: ${CUSTOM_IMAGE}:${CUSTOM_TAG}
+
+  backend:
+    image: ${CUSTOM_IMAGE}:${CUSTOM_TAG}
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail --silent http://localhost:8000/api/method/ping >/dev/null"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  frontend:
+    image: ${CUSTOM_IMAGE}:${CUSTOM_TAG}
+
+  websocket:
+    image: ${CUSTOM_IMAGE}:${CUSTOM_TAG}
+
+  queue-short:
+    image: ${CUSTOM_IMAGE}:${CUSTOM_TAG}
+
+  queue-long:
+    image: ${CUSTOM_IMAGE}:${CUSTOM_TAG}
+
+  scheduler:
+    image: ${CUSTOM_IMAGE}:${CUSTOM_TAG}
