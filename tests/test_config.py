@@ -25,6 +25,11 @@ class ConfigurationTest(unittest.TestCase):
 		lock = json.loads((ROOT / "config" / "versions.json").read_text())
 		self.assertEqual(len(apps), len(lock["apps"]))
 		self.assertEqual([app["branch"] for app in apps], [app["ref"] for app in lock["apps"]])
+		upstream_apps = module.generate(upstream=True)
+		self.assertEqual(upstream_apps[0]["url"], "https://github.com/frappe/erpnext.git")
+		self.assertEqual(
+			upstream_apps[-1]["url"], "https://github.com/loopjet-llc/loopjet-frappe-custom.git"
+		)
 
 	def test_version_sorting(self):
 		module = load_script("check-upstream-updates.py")
