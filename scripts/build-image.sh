@@ -24,7 +24,13 @@ fi
 ./scripts/generate-apps.py "${generate_args[@]}"
 FRAPPE_REF=$(python3 -c 'import json; print(json.load(open("config/versions.json"))["frappe"]["ref"])')
 
+build_flags=()
+if [[ "${NO_CACHE:-0}" == "1" || "${NO_CACHE:-false}" == "true" ]]; then
+  build_flags+=(--no-cache)
+fi
+
 docker build \
+  "${build_flags[@]}" \
   --platform "$BUILD_PLATFORM" \
   --build-arg "FRAPPE_PATH=$FRAPPE_PATH" \
   --build-arg "FRAPPE_BRANCH=$FRAPPE_REF" \
