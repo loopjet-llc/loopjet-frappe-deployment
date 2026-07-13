@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import os
 from typing import Any
+from urllib.parse import urlencode
 
 from mcp.server.auth.middleware.auth_context import get_access_token
 from mcp.server.auth.settings import AuthSettings
@@ -170,12 +170,15 @@ async def update_draft_invoice(name: str, updates: DraftInvoiceUpdate) -> dict[s
 async def get_invoice_pdf_url(name: str, print_format: str = "Loopjet Invoice") -> dict[str, str]:
     """Return an authenticated Frappe PDF download URL for a Sales Invoice."""
     base_url = str(settings.frappe_base_url).rstrip("/")
-    return {
-        "url": (
-            f"{base_url}/api/method/frappe.utils.print_format.download_pdf"
-            f"?doctype=Sales%20Invoice&name={name}&format={print_format}&no_letterhead=0"
-        )
-    }
+    query = urlencode(
+        {
+            "doctype": "Sales Invoice",
+            "name": name,
+            "format": print_format,
+            "no_letterhead": 0,
+        }
+    )
+    return {"url": f"{base_url}/api/method/frappe.utils.print_format.download_pdf?{query}"}
 
 
 @mcp.tool()
@@ -232,8 +235,6 @@ async def add_ticket_comment(name: str, comment: str) -> dict[str, Any]:
 
 
 def main() -> None:
-    if os.environ.get("PORT"):
-        settings.mcp_port = int(os.environ["PORT"])
     mcp.run(transport="streamable-http")
 
 

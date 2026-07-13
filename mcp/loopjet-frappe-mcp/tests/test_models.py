@@ -2,6 +2,7 @@ import pytest
 from pydantic import ValidationError
 
 from loopjet_frappe_mcp.models import DraftInvoiceInput, InvoiceItem, validate_optional_period
+from loopjet_frappe_mcp.server import get_invoice_pdf_url
 
 
 def test_service_period_allows_neither_date() -> None:
@@ -40,3 +41,12 @@ def test_invoice_model_rejects_partial_service_period() -> None:
             service_period_start="2026-07-01",
             items=[InvoiceItem(item_code="SERVICE", qty=1, rate=100)],
         )
+
+
+@pytest.mark.asyncio
+async def test_pdf_url_is_encoded() -> None:
+    result = await get_invoice_pdf_url("ACC/SINV 1", "Loopjet Invoice")
+
+    assert "doctype=Sales+Invoice" in result["url"]
+    assert "name=ACC%2FSINV+1" in result["url"]
+    assert "format=Loopjet+Invoice" in result["url"]
