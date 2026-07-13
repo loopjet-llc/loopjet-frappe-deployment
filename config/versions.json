@@ -46,7 +46,7 @@
     {
       "name": "loopjet_frappe_custom",
       "repository": "loopjet-llc/loopjet-frappe-custom",
-      "ref": "v0.1.7",
+      "ref": "v0.1.8",
       "track": false
     }
   ]
