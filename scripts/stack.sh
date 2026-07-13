@@ -13,6 +13,7 @@ files=(
   -f "$RUNTIME/overrides/compose.mariadb.yaml"
   -f "$RUNTIME/overrides/compose.redis.yaml"
   -f "$ROOT/compose/loopjet.yaml"
+  -f "$ROOT/compose/mcp.yaml"
 )
 
 case "$MODE" in

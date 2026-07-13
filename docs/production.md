@@ -43,6 +43,15 @@ STACK_MODE=hostinger ./scripts/create-sites.sh
 ./scripts/healthcheck.sh
 ```
 
+The MCP sidecar is routed separately through `MCP_SITE`, usually
+`mcp.loopjet.io`. Add that DNS record to the same VPS and expose
+`https://mcp.loopjet.io/mcp` to MCP clients. Team members authenticate with
+their own Frappe API key and secret using:
+
+```text
+Authorization: Bearer <frappe_api_key>:<frappe_api_secret>
+```
+
 ## Required external inputs
 
 Final deployment requires the VPS address and SSH access, production hostnames,

@@ -1,0 +1,19 @@
+services:
+  mcp:
+    build:
+      context: ./mcp/loopjet-frappe-mcp
+    image: ${MCP_IMAGE:-ghcr.io/loopjet-llc/loopjet-frappe-mcp}:${MCP_TAG:-local}
+    platform: ${BUILD_PLATFORM:-linux/amd64}
+    restart: ${RESTART_POLICY:-unless-stopped}
+    environment:
+      FRAPPE_BASE_URL: ${FRAPPE_BASE_URL:-https://erp.loopjet.io}
+      MCP_RESOURCE_SERVER_URL: ${MCP_RESOURCE_SERVER_URL:-https://mcp.loopjet.io}
+      MCP_ISSUER_URL: ${MCP_ISSUER_URL:-https://erp.loopjet.io}
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: 8000
+    healthcheck:
+      test: ["CMD-SHELL", "python -c 'import socket; s=socket.create_connection((\"127.0.0.1\", 8000), 5); s.close()'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s

@@ -34,6 +34,7 @@ Open `http://erp.localhost:8080`, `http://crm.localhost:8080`, and
 
 - [Architecture](docs/architecture.md)
 - [Development](docs/development.md)
+- [MCP server](docs/mcp.md)
 - [Production and Hostinger VPS](docs/production.md)
 - [Upgrades](docs/upgrades.md)
 - [Backup and disaster recovery](docs/disaster-recovery.md)
