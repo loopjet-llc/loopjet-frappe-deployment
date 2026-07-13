@@ -22,8 +22,10 @@ from loopjet_frappe_mcp.models import (
 mcp = FastMCP(
     "Loopjet Frappe",
     instructions=(
-        "Operate on Loopjet ERPNext invoices and Helpdesk tickets. "
-        "Access is always evaluated by Frappe using the current user's API token."
+        "Operate on Loopjet's Frappe/ERPNext/CRM/Helpdesk system through MCP. "
+        "Access is always evaluated by Frappe using the current user's API token. "
+        "Prefer specific tools for invoices and tickets, and use the generic document "
+        "tools for broad Frappe control when the user has permission."
     ),
     host=settings.mcp_host,
     port=settings.mcp_port,
@@ -59,6 +61,269 @@ async def whoami() -> dict[str, str]:
     """Return the Frappe user represented by the current bearer token."""
     user = await _call(_client().get_logged_user())
     return {"user": user}
+
+
+def _require_confirm(action: str, confirm: bool) -> None:
+    if not confirm:
+        raise ToolError(f"Set confirm=true to {action}.")
+
+
+@mcp.tool()
+async def list_doctypes(
+    search: str | None = None,
+    module: str | None = None,
+    limit: int = 50,
+) -> list[dict[str, Any]]:
+    """List Frappe DocTypes visible to the current user."""
+    filters: list[list[Any]] = []
+    if search:
+        filters.append(["DocType", "name", "like", f"%{search}%"])
+    if module:
+        filters.append(["DocType", "module", "=", module])
+    return await _call(
+        _client().list_docs(
+            "DocType",
+            fields=["name", "module", "istable", "issingle", "custom", "modified"],
+            filters=filters,
+            limit=limit,
+            order_by="name asc",
+        )
+    )
+
+
+@mcp.tool()
+async def get_doctype_meta(doctype: str) -> dict[str, Any]:
+    """Get field metadata, permissions, and structure for a Frappe DocType."""
+    return await _call(_client().get_meta(doctype))
+
+
+@mcp.tool()
+async def list_documents(
+    doctype: str,
+    fields: list[str] | None = None,
+    filters: Any | None = None,
+    limit: int = 20,
+    limit_start: int = 0,
+    order_by: str = "modified desc",
+) -> list[dict[str, Any]]:
+    """List documents for any DocType using Frappe filters and field names."""
+    return await _call(
+        _client().list_docs(
+            doctype,
+            fields=fields,
+            filters=filters,
+            limit=limit,
+            limit_start=limit_start,
+            order_by=order_by,
+        )
+    )
+
+
+@mcp.tool()
+async def get_document(doctype: str, name: str) -> dict[str, Any]:
+    """Get one Frappe document by DocType and name."""
+    return await _call(_client().get_doc(doctype, name))
+
+
+@mcp.tool()
+async def create_document(doctype: str, document: dict[str, Any]) -> dict[str, Any]:
+    """Create a document for any DocType permitted by the current Frappe user."""
+    payload = dict(document)
+    payload["doctype"] = doctype
+    return await _call(_client().create_doc(doctype, payload))
+
+
+@mcp.tool()
+async def update_document(doctype: str, name: str, updates: dict[str, Any]) -> dict[str, Any]:
+    """Update a document for any DocType permitted by the current Frappe user."""
+    payload = dict(updates)
+    payload.pop("doctype", None)
+    payload.pop("name", None)
+    return await _call(_client().update_doc(doctype, name, payload))
+
+
+@mcp.tool()
+async def delete_document(doctype: str, name: str, confirm: bool = False) -> dict[str, Any]:
+    """Delete a document. Requires confirm=true and Frappe delete permission."""
+    _require_confirm(f"delete {doctype} {name}", confirm)
+    result = await _call(_client().delete_doc(doctype, name))
+    return result or {"deleted": True, "doctype": doctype, "name": name}
+
+
+@mcp.tool()
+async def submit_document(doctype: str, name: str, confirm: bool = False) -> dict[str, Any]:
+    """Submit a draft document. Requires confirm=true and Frappe submit permission."""
+    _require_confirm(f"submit {doctype} {name}", confirm)
+    return await _call(_client().submit_doc(doctype, name))
+
+
+@mcp.tool()
+async def cancel_document(doctype: str, name: str, confirm: bool = False) -> dict[str, Any]:
+    """Cancel a submitted document. Requires confirm=true and Frappe cancel permission."""
+    _require_confirm(f"cancel {doctype} {name}", confirm)
+    return await _call(_client().cancel_doc(doctype, name))
+
+
+@mcp.tool()
+async def apply_workflow_action(doctype: str, name: str, action: str) -> dict[str, Any]:
+    """Apply a Frappe Workflow action to a document."""
+    return await _call(_client().apply_workflow(doctype, name, action))
+
+
+@mcp.tool()
+async def get_document_count(doctype: str, filters: Any | None = None) -> dict[str, int]:
+    """Count documents for any DocType using optional Frappe filters."""
+    count = await _call(_client().get_count(doctype, filters=filters))
+    return {"count": count}
+
+
+@mcp.tool()
+async def search_link(
+    doctype: str,
+    text: str = "",
+    filters: Any | None = None,
+    query: str | None = None,
+    page_length: int = 20,
+) -> list[dict[str, Any]]:
+    """Use Frappe link search for autocomplete-style lookups."""
+    return await _call(
+        _client().search_link(
+            doctype,
+            text=text,
+            filters=filters,
+            query=query,
+            page_length=page_length,
+        )
+    )
+
+
+@mcp.tool()
+async def list_reports(
+    reference_doctype: str | None = None,
+    report_type: str | None = None,
+    limit: int = 50,
+) -> list[dict[str, Any]]:
+    """List Frappe reports visible to the current user."""
+    filters: list[list[Any]] = []
+    if reference_doctype:
+        filters.append(["Report", "ref_doctype", "=", reference_doctype])
+    if report_type:
+        filters.append(["Report", "report_type", "=", report_type])
+    return await _call(
+        _client().list_docs(
+            "Report",
+            fields=["name", "ref_doctype", "report_type", "is_standard", "modified"],
+            filters=filters,
+            limit=limit,
+            order_by="name asc",
+        )
+    )
+
+
+@mcp.tool()
+async def run_report(
+    report_name: str,
+    filters: dict[str, Any] | None = None,
+    ignore_prepared_report: bool = True,
+) -> dict[str, Any]:
+    """Run a Frappe Query Report or Script Report as the current user."""
+    return await _call(
+        _client().run_report(
+            report_name,
+            filters=filters,
+            ignore_prepared_report=ignore_prepared_report,
+        )
+    )
+
+
+@mcp.tool()
+async def list_print_formats(
+    doctype: str | None = None,
+    limit: int = 50,
+) -> list[dict[str, Any]]:
+    """List Print Formats available in Frappe."""
+    filters: list[list[Any]] = []
+    if doctype:
+        filters.append(["Print Format", "doc_type", "=", doctype])
+    return await _call(
+        _client().list_docs(
+            "Print Format",
+            fields=["name", "doc_type", "standard", "disabled", "print_format_type", "modified"],
+            filters=filters,
+            limit=limit,
+            order_by="name asc",
+        )
+    )
+
+
+@mcp.tool()
+async def get_pdf_url(
+    doctype: str,
+    name: str,
+    print_format: str | None = None,
+    no_letterhead: bool = False,
+) -> dict[str, str]:
+    """Return an authenticated Frappe PDF download URL for any printable document."""
+    base_url = str(settings.frappe_base_url).rstrip("/")
+    query = {
+        "doctype": doctype,
+        "name": name,
+        "no_letterhead": 1 if no_letterhead else 0,
+    }
+    if print_format:
+        query["format"] = print_format
+    return {
+        "url": (f"{base_url}/api/method/frappe.utils.print_format.download_pdf?{urlencode(query)}")
+    }
+
+
+@mcp.tool()
+async def add_comment_to_document(
+    doctype: str,
+    name: str,
+    comment: str,
+    comment_type: str = "Comment",
+) -> dict[str, Any]:
+    """Add a Frappe comment to any document."""
+    doc = {
+        "doctype": "Comment",
+        "comment_type": comment_type,
+        "reference_doctype": doctype,
+        "reference_name": name,
+        "content": comment,
+    }
+    return await _call(_client().create_doc("Comment", doc))
+
+
+@mcp.tool()
+async def assign_document(
+    doctype: str,
+    name: str,
+    allocated_to: str,
+    description: str | None = None,
+    priority: str = "Medium",
+) -> dict[str, Any]:
+    """Assign any document to a Frappe user by creating a ToDo."""
+    doc = {
+        "doctype": "ToDo",
+        "allocated_to": allocated_to,
+        "reference_type": doctype,
+        "reference_name": name,
+        "description": description or f"Review {doctype} {name}",
+        "priority": priority,
+        "status": "Open",
+    }
+    return await _call(_client().create_doc("ToDo", doc))
+
+
+@mcp.tool()
+async def call_frappe_method(
+    method: str,
+    params: dict[str, Any] | None = None,
+    http_method: str = "POST",
+) -> Any:
+    """Call any whitelisted Frappe method as the current user."""
+    return await _call(_client().call_method(method, http_method=http_method, params=params))
 
 
 @mcp.tool()

@@ -1,8 +1,9 @@
 import pytest
+from mcp.server.fastmcp.exceptions import ToolError
 from pydantic import ValidationError
 
 from loopjet_frappe_mcp.models import DraftInvoiceInput, InvoiceItem, validate_optional_period
-from loopjet_frappe_mcp.server import get_invoice_pdf_url
+from loopjet_frappe_mcp.server import delete_document, get_invoice_pdf_url, get_pdf_url
 
 
 def test_service_period_allows_neither_date() -> None:
@@ -50,3 +51,18 @@ async def test_pdf_url_is_encoded() -> None:
     assert "doctype=Sales+Invoice" in result["url"]
     assert "name=ACC%2FSINV+1" in result["url"]
     assert "format=Loopjet+Invoice" in result["url"]
+
+
+@pytest.mark.asyncio
+async def test_generic_pdf_url_is_encoded() -> None:
+    result = await get_pdf_url("Sales Invoice", "ACC/SINV 1", "Loopjet Invoice")
+
+    assert "doctype=Sales+Invoice" in result["url"]
+    assert "name=ACC%2FSINV+1" in result["url"]
+    assert "format=Loopjet+Invoice" in result["url"]
+
+
+@pytest.mark.asyncio
+async def test_delete_document_requires_confirm() -> None:
+    with pytest.raises(ToolError, match="confirm=true"):
+        await delete_document("Note", "NOTE-1")

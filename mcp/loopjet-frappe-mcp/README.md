@@ -1,6 +1,7 @@
 # Loopjet Frappe MCP
 
-Remote MCP server for Loopjet ERPNext invoices and Frappe Helpdesk tickets.
+Remote MCP server for Loopjet's Frappe stack: ERPNext, CRM, HR, and Helpdesk.
+It exposes broad Frappe document control without requiring the web UI.
 
 ## Authentication
 
@@ -27,10 +28,34 @@ The MCP endpoint is:
 /mcp
 ```
 
+## Tool coverage
+
+Generic Frappe tools:
+
+- inspect DocTypes and metadata
+- list, get, create, update, and delete documents
+- submit, cancel, and apply workflow actions
+- count documents
+- run reports
+- search link fields
+- list print formats and generate PDF URLs
+- add comments
+- assign documents with ToDos
+- call whitelisted Frappe methods
+
+Loopjet-specific convenience tools:
+
+- customers
+- draft invoices
+- invoice PDF URLs
+- Helpdesk tickets
+
 ## Guardrails
 
 - Invoices are created as drafts.
-- No delete/cancel/submit tools are exposed.
+- Delete, submit, and cancel require `confirm=true`.
 - Service periods are optional, but if one date is provided then both start and
   end dates are required.
 - Reverse charge is an explicit boolean field.
+- Every request is still executed by Frappe as the API-key owner, so Frappe
+  roles and permissions remain authoritative.
