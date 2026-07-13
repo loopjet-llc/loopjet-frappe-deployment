@@ -3,6 +3,7 @@ set -Eeuo pipefail
 
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 cd "$ROOT"
+export LOOPJET_DEPLOYMENT_ROOT="$ROOT"
 
 MODE=${1:-local}
 shift || true

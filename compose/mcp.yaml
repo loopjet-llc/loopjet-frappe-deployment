@@ -1,7 +1,7 @@
 services:
   mcp:
     build:
-      context: ./mcp/loopjet-frappe-mcp
+      context: ${LOOPJET_DEPLOYMENT_ROOT:?LOOPJET_DEPLOYMENT_ROOT not set}/mcp/loopjet-frappe-mcp
     image: ${MCP_IMAGE:-ghcr.io/loopjet-llc/loopjet-frappe-mcp}:${MCP_TAG:-local}
     platform: ${BUILD_PLATFORM:-linux/amd64}
     restart: ${RESTART_POLICY:-unless-stopped}
