@@ -15,6 +15,16 @@ https://mcp.loopjet.io/mcp
 
 Every team member should use their own Frappe API key and API secret.
 
+In Frappe, open:
+
+```text
+/app/mcp-setup
+```
+
+The MCP setup page lets each signed-in user generate, rotate, and revoke their
+own MCP API credentials. It also shows copy-ready snippets for ChatGPT/OpenAI
+API, Claude API, Claude Code, Codex, and generic MCP clients.
+
 MCP client header:
 
 ```text
@@ -25,6 +35,25 @@ The MCP server validates the token against Frappe and forwards all API calls to
 Frappe as that same user. Frappe roles and permissions stay authoritative.
 
 Do not use an Administrator key for daily agent work.
+
+The API secret is only shown immediately after generation. If it is lost, rotate
+the key from `/app/mcp-setup`.
+
+## Claude and ChatGPT setup
+
+The setup page includes current connection snippets for:
+
+- ChatGPT/OpenAI Responses API remote MCP tools using `server_url` and
+  `authorization`.
+- ChatGPT developer-mode app metadata using the public `/mcp` endpoint.
+- Claude API `mcp_servers` using `authorization_token` and the
+  `mcp-client-2025-11-20` beta.
+- Claude Code remote HTTP MCP command with the authorization header.
+
+For ChatGPT or Claude web workspace-wide custom connectors, OAuth may be
+required for production per-user private-data access. The page therefore gives
+direct API/CLI bearer-token snippets now and clearly labels the web developer
+mode path.
 
 ## Tools
 
