@@ -1,7 +1,8 @@
 # Loopjet Frappe Platform
 
 Reproducible development and production deployment for ERPNext, Frappe HR,
-Frappe CRM, and Frappe Helpdesk, extended by `loopjet_frappe_custom`.
+Frappe CRM, Frappe Helpdesk, and Raven team chat, extended by
+`loopjet_frappe_custom`.
 
 The platform is built from reviewed, pinned upstream releases. Product code is
 never edited in this repository. Loopjet behavior belongs in the custom app.
@@ -10,7 +11,7 @@ never edited in this repository. Loopjet behavior belongs in the custom app.
 
 | Site | Applications |
 | --- | --- |
-| `erp.localhost` | ERPNext, Frappe HR, Loopjet Custom |
+| `erp.localhost` | ERPNext, Frappe HR, Raven, Loopjet Custom |
 | `crm.localhost` | Frappe CRM, Loopjet Custom |
 | `helpdesk.localhost` | Frappe Helpdesk, Loopjet Custom |
 

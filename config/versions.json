@@ -44,6 +44,11 @@
       "ref": "v1.27.0"
     },
     {
+      "name": "raven",
+      "repository": "The-Commit-Company/raven",
+      "ref": "v2.8.11"
+    },
+    {
       "name": "loopjet_frappe_custom",
       "repository": "loopjet-llc/loopjet-frappe-custom",
       "ref": "v0.1.12",

@@ -21,9 +21,11 @@ Do not expose MariaDB or Redis ports publicly.
 
 Loopjet uses one connected Frappe site. `ERP_SITE` is the canonical site and
 installs ERPNext, HRMS, Frappe CRM, Frappe Helpdesk, Telephony, and the Loopjet
-custom app into one database. `CRM_SITE` and `HELPDESK_SITE` are domain aliases
-for that same site, which keeps leads, deals, quotations, invoices, customers,
-contacts, and tickets connected.
+custom app into one database. Raven is installed on the same site at `/raven`
+so system users can message one another and link ERP records in conversations.
+`CRM_SITE` and `HELPDESK_SITE` are domain aliases for that same site, which keeps
+leads, deals, quotations, invoices, customers, contacts, tickets, and chat
+available through one user directory.
 
 ## Existing Hostinger Docker and Traefik VPS
 

@@ -44,6 +44,7 @@ install_app "$ERP_SITE" erpnext
 install_app "$ERP_SITE" hrms
 install_app "$ERP_SITE" crm
 install_app "$ERP_SITE" helpdesk
+install_app "$ERP_SITE" raven
 install_app "$ERP_SITE" loopjet_frappe_custom
 
 ensure_alias() {

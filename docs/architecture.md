@@ -11,13 +11,16 @@ An additional `loopjet-telephony` mirror pins Helpdesk's required Telephony app.
 Upstream Telephony currently has only a floating `develop` branch, so Loopjet
 creates reviewed dated tags rather than allowing non-reproducible builds.
 
+Raven is pinned as a reviewed third-party application in the same immutable
+image and provides team messaging on the connected ERP site.
+
 `loopjet-frappe-custom` owns Loopjet behavior. `loopjet-frappe-deployment` owns
 the version lock, image build, environment composition, and operating scripts.
 
 ## Runtime
 
 One immutable image contains Frappe Framework, ERPNext, HRMS, CRM, Helpdesk,
-and Loopjet Custom. Site installation determines which apps are active:
+Raven, and Loopjet Custom. Site installation determines which apps are active:
 
 The image uses exact official release tags and Frappe Docker's source-building `custom` Containerfile. This is
 intentional: exact Frappe release tags do not always have matching prebuilt
@@ -27,7 +30,7 @@ and Helpdesk frontend build remains stable on standard CI and VPS builders.
 
 ```mermaid
 flowchart TD
-  I["Pinned immutable application image"] --> E["ERP site: ERPNext + HRMS + Loopjet Custom"]
+  I["Pinned immutable application image"] --> E["ERP site: ERPNext + HRMS + Raven + Loopjet Custom"]
   I --> C["CRM site: CRM + Loopjet Custom"]
   I --> H["Helpdesk site: Helpdesk + Loopjet Custom"]
   E --> M[(MariaDB)]

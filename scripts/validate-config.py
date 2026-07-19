@@ -19,7 +19,15 @@ def main() -> None:
 	assert TAG.match(data["frappe"]["ref"])
 	names = [app["name"] for app in data["apps"]]
 	assert len(names) == len(set(names))
-	assert names == ["erpnext", "hrms", "crm", "telephony", "helpdesk", "loopjet_frappe_custom"]
+	assert names == [
+		"erpnext",
+		"hrms",
+		"crm",
+		"telephony",
+		"helpdesk",
+		"raven",
+		"loopjet_frappe_custom",
+	]
 	for app in data["apps"]:
 		assert TAG.match(app["ref"]), app
 		assert re.match(r"^[\w.-]+/[\w.-]+$", app["repository"]), app

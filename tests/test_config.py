@@ -29,8 +29,16 @@ class ConfigurationTest(unittest.TestCase):
 		upstream_apps = module.generate(upstream=True)
 		self.assertEqual(upstream_apps[0]["url"], "https://github.com/frappe/erpnext.git")
 		self.assertEqual(upstream_apps[3]["url"], "https://github.com/loopjet-llc/loopjet-telephony.git")
-		self.assertEqual(
-			upstream_apps[-1]["url"], "https://github.com/loopjet-llc/loopjet-frappe-custom.git"
+		self.assertIn(
+			{"url": "https://github.com/The-Commit-Company/raven.git", "branch": "v2.8.11"},
+			upstream_apps,
+		)
+		self.assertIn(
+			{
+				"url": "https://github.com/loopjet-llc/loopjet-frappe-custom.git",
+				"branch": "v0.1.12",
+			},
+			upstream_apps,
 		)
 
 	def test_version_sorting(self):
