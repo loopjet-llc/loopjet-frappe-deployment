@@ -30,13 +30,20 @@ class ConfigurationTest(unittest.TestCase):
 		self.assertEqual(upstream_apps[0]["url"], "https://github.com/frappe/erpnext.git")
 		self.assertEqual(upstream_apps[3]["url"], "https://github.com/loopjet-llc/loopjet-telephony.git")
 		self.assertIn(
+			{
+				"url": "https://github.com/loopjet-llc/loopjet-helpdesk.git",
+				"branch": "v1.27.0-loopjet.1",
+			},
+			upstream_apps,
+		)
+		self.assertIn(
 			{"url": "https://github.com/The-Commit-Company/raven.git", "branch": "v2.8.11"},
 			upstream_apps,
 		)
 		self.assertIn(
 			{
 				"url": "https://github.com/loopjet-llc/loopjet-frappe-custom.git",
-				"branch": "v0.1.20",
+				"branch": "v0.1.21",
 			},
 			upstream_apps,
 		)
@@ -57,6 +64,11 @@ class ConfigurationTest(unittest.TestCase):
 			module.apply_overlay(root)
 			content = containerfile.read_text()
 			self.assertEqual(content.count("ARG NODE_OPTIONS"), 1)
+
+	def test_build_uses_apps_manifest_as_cache_key(self):
+		build_script = (ROOT / "scripts" / "build-image.sh").read_text()
+		self.assertIn("APPS_CACHE_BUST=", build_script)
+		self.assertIn('--build-arg "CACHE_BUST=$APPS_CACHE_BUST"', build_script)
 
 
 if __name__ == "__main__":

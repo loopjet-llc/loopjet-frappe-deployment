@@ -23,6 +23,7 @@ elif [[ "$SOURCE_MODE" != mirror ]]; then
 fi
 ./scripts/generate-apps.py "${generate_args[@]}"
 FRAPPE_REF=$(python3 -c 'import json; print(json.load(open("config/versions.json"))["frappe"]["ref"])')
+APPS_CACHE_BUST=$(python3 -c 'import hashlib; print(hashlib.sha256(open("config/apps.generated.json", "rb").read()).hexdigest())')
 
 build_flags=()
 if [[ "${NO_CACHE:-0}" == "1" || "${NO_CACHE:-false}" == "true" ]]; then
@@ -34,6 +35,7 @@ docker build \
   --platform "$BUILD_PLATFORM" \
   --build-arg "FRAPPE_PATH=$FRAPPE_PATH" \
   --build-arg "FRAPPE_BRANCH=$FRAPPE_REF" \
+  --build-arg "CACHE_BUST=$APPS_CACHE_BUST" \
   --secret "id=apps_json,src=$ROOT/config/apps.generated.json" \
   --tag "$CUSTOM_IMAGE:$CUSTOM_TAG" \
   --file "$RUNTIME/images/custom/Containerfile" \
