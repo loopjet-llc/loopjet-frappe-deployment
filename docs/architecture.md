@@ -4,8 +4,9 @@
 
 The five public product repositories mirror the corresponding
 Frappe upstream projects. They exist for continuity, auditability, and isolated
-emergency patches. Daily workflows fast-forward their product branches, but
-production does not automatically adopt those changes.
+emergency patches. Daily workflows synchronize product source while retaining
+Loopjet-controlled files under `.github/workflows`; production does not
+automatically adopt those changes.
 
 An additional `loopjet-telephony` mirror pins Helpdesk's required Telephony app.
 Upstream Telephony currently has only a floating `develop` branch, so Loopjet
