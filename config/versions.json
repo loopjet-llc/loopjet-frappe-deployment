@@ -1,33 +1,33 @@
 {
   "schema": 1,
-  "generated_at": "2026-07-11",
+  "generated_at": "2026-08-10",
   "frappe_docker": {
     "repository": "frappe/frappe_docker",
-    "ref": "v3.2.1"
+    "ref": "v3.2.2"
   },
   "frappe": {
     "repository": "loopjet-llc/loopjet-frappe",
     "upstream": "frappe/frappe",
-    "ref": "v16.26.3"
+    "ref": "v16.30.0"
   },
   "apps": [
     {
       "name": "erpnext",
       "repository": "loopjet-llc/loopjet-erpnext",
       "upstream": "frappe/erpnext",
-      "ref": "v16.26.2"
+      "ref": "v16.31.1"
     },
     {
       "name": "hrms",
       "repository": "loopjet-llc/loopjet-hrms",
       "upstream": "frappe/hrms",
-      "ref": "v16.12.1"
+      "ref": "v16.16.0"
     },
     {
       "name": "crm",
       "repository": "loopjet-llc/loopjet-crm",
       "upstream": "frappe/crm",
-      "ref": "v1.77.3"
+      "ref": "v1.81.1"
     },
     {
       "name": "telephony",
