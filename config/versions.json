@@ -41,7 +41,7 @@
       "name": "helpdesk",
       "repository": "loopjet-llc/loopjet-helpdesk",
       "upstream": "frappe/helpdesk",
-      "ref": "v1.27.0-loopjet.1",
+      "ref": "v1.27.0-loopjet.2",
       "track": false,
       "use_mirror": true
     },
