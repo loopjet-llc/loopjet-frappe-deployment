@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at": "2026-08-28",
+  "generated_at": "2026-09-01",
   "frappe_docker": {
     "repository": "frappe/frappe_docker",
     "ref": "v3.2.1"
@@ -41,7 +41,7 @@
       "name": "helpdesk",
       "repository": "loopjet-llc/loopjet-helpdesk",
       "upstream": "frappe/helpdesk",
-      "ref": "v1.27.0-loopjet.4",
+      "ref": "v1.27.0-loopjet.5",
       "track": false,
       "use_mirror": true
     },
