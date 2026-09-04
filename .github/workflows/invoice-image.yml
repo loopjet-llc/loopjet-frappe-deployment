@@ -1,0 +1,41 @@
+name: Publish invoice CI image
+
+on:
+  push:
+    tags: ["invoice-ci-v0.4.2"]
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/loopjet-llc/loopjet-frappe-suite:platform-v0.4.2-invoice-ci
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: loopjet-llc/loopjet-frappe-custom
+          ref: c721df6081efc8636abfdd5d00d3ddbf8ac6aee0
+          path: .invoice-custom
+          persist-credentials: false
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build the invoice-only image from the production digest
+        run: |
+          docker build -f docker/Invoice.Containerfile \
+            --label org.opencontainers.image.revision="${GITHUB_SHA}" \
+            --label org.opencontainers.image.version=platform-v0.4.2-invoice-ci \
+            --tag "$IMAGE" .
+      - name: Verify exact invoice content and repeated installation
+        run: docker run --rm -i --network none --entrypoint /home/frappe/frappe-bench/env/bin/python "$IMAGE" - < scripts/check-invoice-image.py
+      - name: Publish the verified image
+        run: docker push "$IMAGE"
