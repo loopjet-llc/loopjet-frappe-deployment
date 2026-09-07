@@ -1,0 +1,41 @@
+name: Publish customer reports image
+
+on:
+  push:
+    tags: ["customer-reports-v0.4.3"]
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/loopjet-llc/loopjet-frappe-suite:platform-v0.4.3-customer-reports
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: loopjet-llc/loopjet-frappe-custom
+          ref: ecd424afb4e1b1b9e0ac203854c213b9d617c37e
+          path: .customer-reports-custom
+          persist-credentials: false
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build the customer-reports image from the current production digest
+        run: |
+          docker build -f docker/CustomerReports.Containerfile \
+            --label org.opencontainers.image.revision="${GITHUB_SHA}" \
+            --label org.opencontainers.image.version=platform-v0.4.3-customer-reports \
+            --tag "$IMAGE" .
+      - name: Verify customer reports without network access
+        run: docker run --rm -i --network none --entrypoint /home/frappe/frappe-bench/env/bin/python "$IMAGE" - < scripts/check-customer-reports-image.py
+      - name: Publish the verified image
+        run: docker push "$IMAGE"
