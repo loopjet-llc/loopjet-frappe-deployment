@@ -1,0 +1,66 @@
+name: Publish Helpdesk Kanban image
+
+on:
+  push:
+    tags: ["helpdesk-kanban-abd86213c"]
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/loopjet-llc/loopjet-frappe-suite:platform-v0.4.4-helpdesk-kanban-abd86213c
+  BOARD_COMMIT: abd86213c2255e378eb9c31b5c30ed424fd4cfb7
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build the patch on the production base image
+        shell: bash
+        run: |
+          build_dir=$(mktemp -d "$RUNNER_TEMP/helpdesk-kanban.XXXXXX")
+          curl --fail --silent --show-error --location --max-time 30 \
+            "https://github.com/loopjet-llc/loopjet-helpdesk/commit/$BOARD_COMMIT.patch" \
+            --output "$build_dir/helpdesk-kanban.patch"
+          printf '%s  %s\n' fbf24dd8bfb46a0974e1799645c7a8bb7e3ddb1b9482f40257e4d775536a5477 \
+            "$build_dir/helpdesk-kanban.patch" | sha256sum --check
+          docker build --pull --platform linux/amd64 -f docker/HelpdeskKanban.Containerfile \
+            --tag "$IMAGE" "$build_dir"
+      - name: Verify the packaged Helpdesk source and browser assets
+        shell: bash
+        run: |
+          docker run --rm -i --network none --entrypoint /bin/bash "$IMAGE" -se <<'SH'
+          set -euo pipefail
+          cd /home/frappe/frappe-bench
+          sha256sum --check <<'HASHES'
+          1b5a553b885171dccf3b25f7d69a4df05e7a707f6d0ccf9b8018537a67a77c5c  apps/helpdesk/desk/src/components/ticket/TicketKanban.vue
+          cb35c5fd592eea4b631a88d406a4199ad643863237b91324a847297f0455b99a  apps/helpdesk/helpdesk/api/doc.py
+          HASHES
+          env/bin/python -m py_compile apps/helpdesk/helpdesk/api/doc.py
+          env/bin/python - <<'PY'
+          import re
+          from pathlib import Path
+
+          index = Path('apps/helpdesk/helpdesk/www/helpdesk/index.html').read_text()
+          public = Path('assets/helpdesk/desk')
+          entry_assets = re.findall(r'/assets/helpdesk/desk/(assets/[^"\']+\.(?:js|css))', index)
+          assert entry_assets and all((public / item).is_file() for item in entry_assets)
+          assert any('overscroll-y-contain' in (public / item).read_text()
+                     for item in entry_assets if item.endswith('.css'))
+          cache = (public / 'sw.js').read_text()
+          chunks = [f for f in (public / 'assets').glob('ListViewBuilder*.js') if f.name in cache]
+          assert any('Gemeldet von' in f.read_text() and 'overscroll-y-contain' in f.read_text()
+                     for f in chunks)
+          PY
+          SH
+      - name: Publish the verified image
+        run: docker push "$IMAGE"
