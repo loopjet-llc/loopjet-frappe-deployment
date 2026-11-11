@@ -32,7 +32,7 @@ class ConfigurationTest(unittest.TestCase):
 		self.assertIn(
 			{
 				"url": "https://github.com/loopjet-llc/loopjet-helpdesk.git",
-				"branch": "v1.27.0-loopjet.1",
+				"branch": "v1.32.0-loopjet.5",
 			},
 			upstream_apps,
 		)
@@ -43,7 +43,7 @@ class ConfigurationTest(unittest.TestCase):
 		self.assertIn(
 			{
 				"url": "https://github.com/loopjet-llc/loopjet-frappe-custom.git",
-				"branch": "v0.3.1",
+				"branch": "v0.4.4",
 			},
 			upstream_apps,
 		)
@@ -60,10 +60,14 @@ class ConfigurationTest(unittest.TestCase):
 			containerfile = root / "images" / "custom" / "Containerfile"
 			containerfile.parent.mkdir(parents=True)
 			containerfile.write_text(module.NEEDLE)
+			entrypoint = root / "resources" / "core" / "main-entrypoint.sh"
+			entrypoint.parent.mkdir(parents=True)
+			entrypoint.write_text(module.ASSET_LINK)
 			module.apply_overlay(root)
 			module.apply_overlay(root)
 			content = containerfile.read_text()
 			self.assertEqual(content.count("ARG NODE_OPTIONS"), 1)
+			self.assertEqual(entrypoint.read_text().count(module.SERIAL_ASSET_LINK), 1)
 
 	def test_build_uses_apps_manifest_as_cache_key(self):
 		build_script = (ROOT / "scripts" / "build-image.sh").read_text()

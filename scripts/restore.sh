@@ -40,6 +40,7 @@ if [[ -n "$private_files" ]]; then
 fi
 
 ./scripts/stack.sh "$MODE" exec -T backend "${args[@]}"
+./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" clear-cache
 ./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" migrate
 ./scripts/stack.sh "$MODE" exec -T backend rm -rf "$staging"
 echo "Restore completed for $site."
