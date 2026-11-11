@@ -14,12 +14,14 @@ MODE=${STACK_MODE:-production}
   exit 2
 }
 
+site=$ERP_SITE
 ./scripts/backup.sh
 ./scripts/stack.sh "$MODE" pull
+./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" set-maintenance-mode on
 ./scripts/stack.sh "$MODE" up -d --remove-orphans
 
-site=$ERP_SITE
-./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" set-maintenance-mode on
+# The next Bench process must discover modules from the new image.
+./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" clear-cache
 ./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" migrate
 ./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" clear-cache
 ./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" set-maintenance-mode off
