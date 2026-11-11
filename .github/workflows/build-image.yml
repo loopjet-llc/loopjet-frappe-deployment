@@ -60,4 +60,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # A release image can be used as soon as it is pushed.
+          cache-to: ${{ github.ref_type != 'tag' && 'type=gha,mode=max,timeout=3m,ignore-error=true' || '' }}
