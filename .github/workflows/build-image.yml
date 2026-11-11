@@ -16,11 +16,14 @@ jobs:
       - uses: actions/checkout@v7
       - name: Generate application manifest
         run: ./scripts/generate-apps.py --upstream
-      - name: Read version lock
+      - name: Read version lock and application manifest hash
         id: versions
         run: |
-          echo "frappe_ref=$(python -c 'import json; print(json.load(open("config/versions.json"))["frappe"]["ref"])')" >> "$GITHUB_OUTPUT"
-          echo "docker_ref=$(python -c 'import json; print(json.load(open("config/versions.json"))["frappe_docker"]["ref"])')" >> "$GITHUB_OUTPUT"
+          {
+            echo "frappe_ref=$(python -c 'import json; print(json.load(open("config/versions.json"))["frappe"]["ref"])')"
+            echo "docker_ref=$(python -c 'import json; print(json.load(open("config/versions.json"))["frappe_docker"]["ref"])')"
+            echo "apps_hash=$(sha256sum config/apps.generated.json | cut -d ' ' -f1)"
+          } >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v7
         with:
           repository: frappe/frappe_docker
@@ -51,6 +54,7 @@ jobs:
             FRAPPE_PATH=https://github.com/frappe/frappe.git
             FRAPPE_BRANCH=${{ steps.versions.outputs.frappe_ref }}
             NODE_OPTIONS=--max-old-space-size=4096
+            CACHE_BUST=${{ steps.versions.outputs.apps_hash }}
           secret-files: |
             apps_json=${{ github.workspace }}/config/apps.generated.json
           tags: ${{ steps.meta.outputs.tags }}
