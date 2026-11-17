@@ -32,7 +32,7 @@ class ConfigurationTest(unittest.TestCase):
 		self.assertIn(
 			{
 				"url": "https://github.com/loopjet-llc/loopjet-helpdesk.git",
-				"branch": "v1.32.0-loopjet.5",
+				"branch": "v1.32.0-loopjet.6",
 			},
 			upstream_apps,
 		)
@@ -43,7 +43,7 @@ class ConfigurationTest(unittest.TestCase):
 		self.assertIn(
 			{
 				"url": "https://github.com/loopjet-llc/loopjet-frappe-custom.git",
-				"branch": "v0.4.4",
+				"branch": "v0.4.5",
 			},
 			upstream_apps,
 		)
