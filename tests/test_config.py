@@ -29,10 +29,11 @@ class ConfigurationTest(unittest.TestCase):
 		upstream_apps = module.generate(upstream=True)
 		self.assertEqual(upstream_apps[0]["url"], "https://github.com/frappe/erpnext.git")
 		self.assertEqual(upstream_apps[3]["url"], "https://github.com/loopjet-llc/loopjet-telephony.git")
+		helpdesk_ref = next(app["ref"] for app in lock["apps"] if app["name"] == "helpdesk")
 		self.assertIn(
 			{
 				"url": "https://github.com/loopjet-llc/loopjet-helpdesk.git",
-				"branch": "v1.32.0-loopjet.8",
+				"branch": helpdesk_ref,
 			},
 			upstream_apps,
 		)
