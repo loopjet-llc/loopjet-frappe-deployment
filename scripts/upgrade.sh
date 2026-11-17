@@ -16,7 +16,8 @@ MODE=${STACK_MODE:-production}
 
 site=$ERP_SITE
 ./scripts/backup.sh
-./scripts/stack.sh "$MODE" pull
+# The MCP sidecar is built locally and has no registry image to pull.
+./scripts/stack.sh "$MODE" pull --ignore-buildable
 ./scripts/stack.sh "$MODE" exec -T backend bench --site "$site" set-maintenance-mode on
 ./scripts/stack.sh "$MODE" up -d --remove-orphans
 
